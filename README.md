@@ -1,6 +1,6 @@
 # Dapper.Contrib.BulkInsert
 
-Easy to use Dapper batch insert, support MySQL, SQLServer, ClickHouse
+Easy to use Dapper batch insert, support MySQL, SQLServer, ClickHouse and other instances of `DbConnection`
 
 
 ## Demo
