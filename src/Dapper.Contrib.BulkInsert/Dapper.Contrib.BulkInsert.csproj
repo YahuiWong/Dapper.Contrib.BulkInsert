@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	 <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Authors>YahuiWong</Authors>
+    <Description>Dapper bulk insert with Dapper.</Description>
+    <PackageProjectUrl>https://github.com/YahuiWong/Dapper.Contrib.BulkInsert</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/YahuiWong/Dapper.Contrib.BulkInsert.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>clickhouse,dapper,bulk,mysql,sqlserver</PackageTags>
+    <Version>0.1.0</Version>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	  <PackageLicenseUrl>https://github.com/YahuiWong/Dapper.Contrib.BulkInsert/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageId>Dapper.Contrib.BulkInsert</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ClickHouse.Client" Version="3.1.0.379" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="1.50.5" />
+  </ItemGroup>
+
+</Project>
