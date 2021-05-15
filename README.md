@@ -17,7 +17,7 @@ Easy to use Dapper batch insert, support MySQL, SQLServer, ClickHouse and other 
         public string Name { get; set; }
         public int Age { get; set; }
     }
-}
+
 ```
 ### InsertBulk
 ```c#
