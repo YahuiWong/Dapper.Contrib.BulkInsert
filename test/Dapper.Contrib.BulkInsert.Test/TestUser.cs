@@ -10,6 +10,7 @@ namespace Dapper.Contrib.BulkInsert.Test
         [Date]
         public DateTime ResisterDate { get; set; }
         public DateTime ResisterTime { get; set; }
+        [ColumnName("Name")]
         public string Name { get; set; }
         public int Age { get; set; }
     }

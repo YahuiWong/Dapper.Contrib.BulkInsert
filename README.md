@@ -14,6 +14,7 @@ Easy to use Dapper batch insert, support MySQL, SQLServer, ClickHouse and other 
         [Date]
         public DateTime ResisterDate { get; set; }
         public DateTime ResisterTime { get; set; }
+        [ColumnName("Name")]
         public string Name { get; set; }
         public int Age { get; set; }
     }
