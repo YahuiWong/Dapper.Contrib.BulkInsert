@@ -6,9 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using ClickHouse.Client.ADO;
-using ClickHouse.Client.Copy;
-using Dapper;
 
 namespace Dapper.Contrib.BulkInsert
 {
@@ -18,7 +15,7 @@ namespace Dapper.Contrib.BulkInsert
 
         /// <summary>
         /// Inserts an entity into table "Ts" and returns identity id or number of inserted rows if inserting a list.
-        /// </summary>
+        /// </summary> 
         /// <param name="connection">Open SqlConnection</param>
         /// <param name="entityToInsert">Entity to insert, can be list of entities</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
@@ -39,7 +36,7 @@ namespace Dapper.Contrib.BulkInsert
         /// <param name="connection">Open SqlConnection</param>
         /// <param name="entityToInsert">Entity to insert, can be list of entities</param>
         /// <returns>Identity of inserted entity, or number of inserted rows if inserting a list</returns>
-        public static async Task InsertBulkAsync<T>(this ClickHouseConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null)
+        public static async Task InsertBulkAsync<T>(this ClickHouse.Client.ADO.ClickHouseConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null)
         {
 
             var wasClosed = connection.State == ConnectionState.Closed;
@@ -116,7 +113,7 @@ namespace Dapper.Contrib.BulkInsert
                     rowList.Add(row);
                 }
             }
-            using (var bulkCopy = new ClickHouseBulkCopy(connection)
+            using (var bulkCopy = new ClickHouse.Client.Copy.ClickHouseBulkCopy(connection)
             {
                 DestinationTableName = name,
                 MaxDegreeOfParallelism = 2,

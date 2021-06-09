@@ -6,10 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Collections.Concurrent;
-using System.Reflection.Emit;
-using Dapper;
-using ClickHouse.Client.ADO;
-using ClickHouse.Client.Copy;
+
 
 namespace Dapper.Contrib.BulkInsert
 {
@@ -277,14 +274,24 @@ namespace Dapper.Contrib.BulkInsert
                         {
                             if (property.PropertyType == typeof(DateTime))
                             {
+                                var datetimevalue = Convert.ToDateTime(val);
                                 if (property.GetCustomAttribute<DateAttribute>() != null)
                                 {
-                                    parameters.Add(columnName, string.Format("{0:yyyy-MM-dd}", val));
+                                    parameters.Add(columnName, datetimevalue.Date, DbType.Date);
                                     //sbParameterList.AppendFormat("'{0:yyyy-MM-dd}'", val);
                                 }
                                 else
                                 {
-                                    parameters.Add(columnName, string.Format("{0:yyyy-MM-dd HH:mm:ss}", val));
+                                    parameters.Add(columnName, datetimevalue, DbType.DateTime);
+                                    //sbParameterList.AppendFormat("'{0:yyyy-MM-dd HH:mm:ss}'", val);
+                                }
+                            }
+                            else if (property.PropertyType == typeof(Boolean))
+                            {
+                                var boolvalue = Convert.ToBoolean(val);
+                                
+                                {
+                                    parameters.Add(columnName, boolvalue?1:0, DbType.Int32);
                                     //sbParameterList.AppendFormat("'{0:yyyy-MM-dd HH:mm:ss}'", val);
                                 }
                             }
@@ -338,7 +345,7 @@ namespace Dapper.Contrib.BulkInsert
         /// <param name="connection">Open SqlConnection</param>
         /// <param name="entityToInsert">Entity to insert, can be list of entities</param>
         /// <returns>Identity of inserted entity, or number of inserted rows if inserting a list</returns>
-        public static void InsertBulk<T>(this ClickHouseConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null)
+        public static void InsertBulk<T>(this ClickHouse.Client.ADO.ClickHouseConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null)
         {
             InsertBulkAsync(connection, entityToInsert, commandTimeout).GetAwaiter().GetResult();
         }

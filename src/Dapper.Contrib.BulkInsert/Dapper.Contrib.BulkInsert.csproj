@@ -8,12 +8,13 @@
     <RepositoryUrl>https://github.com/YahuiWong/Dapper.Contrib.BulkInsert.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>clickhouse,dapper,bulk,mysql,sqlserver</PackageTags>
-    <Version>0.1.0</Version>
+    <Version>0.1.5</Version>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 	  <PackageLicenseUrl>https://github.com/YahuiWong/Dapper.Contrib.BulkInsert/blob/master/LICENSE</PackageLicenseUrl>
     <PackageId>Dapper.Contrib.BulkInsert</PackageId>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="ClickHouse.Ado" Version="1.3.1" />
     <PackageReference Include="ClickHouse.Client" Version="3.1.0.379" />
   </ItemGroup>
   <ItemGroup>
