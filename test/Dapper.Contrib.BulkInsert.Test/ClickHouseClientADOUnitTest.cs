@@ -5,10 +5,10 @@ using Xunit;
 
 namespace Dapper.Contrib.BulkInsert.Test
 {
-    public class ClickHouseUnitTest
+    public class ClickHouseClientADOUnitTest
     {
         ClickHouseConnection conn;
-        public ClickHouseUnitTest()
+        public ClickHouseClientADOUnitTest()
         {
             conn = new ClickHouseConnection("Compress=True;CheckCompressedHash=False;Compressor=lz4;Host=127.0.0.1;Port=8123;Database=default;User=default;Password=;");
             conn.Open();
