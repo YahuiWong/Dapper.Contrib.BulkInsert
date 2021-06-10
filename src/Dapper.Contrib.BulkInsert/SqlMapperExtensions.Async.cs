@@ -27,7 +27,7 @@ namespace Dapper.Contrib.BulkInsert
             var wasClosed = connection.State == ConnectionState.Closed;
             if (wasClosed) connection.Open();
 
-            await connection.ExecuteAsync(cmd.Item1,cmd.Item2, null, commandTimeout);
+            await connection.ExecuteAsync(cmd.Item1,cmd.Item2, null, commandTimeout, CommandType.Text);
             if (wasClosed) connection.Close();
         }
         /// <summary>
@@ -128,7 +128,18 @@ namespace Dapper.Contrib.BulkInsert
 
             if (wasClosed) connection.Close();
         }
-
+        /// <summary>
+        /// Inserts an entity into table "Ts" and returns identity id or number of inserted rows if inserting a list.
+        /// </summary>
+        /// <param name="connection">Open SqlConnection</param>
+        /// <param name="entityToInsert">Entity to insert, can be list of entities</param>
+        /// <returns>Identity of inserted entity, or number of inserted rows if inserting a list</returns>
+        public static async Task InsertBulkAsync<T>(this ClickHouse.Ado.ClickHouseConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null)
+        {
+            await Task.Run(() => InsertBulk(connection, entityToInsert, commandTimeout)
+            );
+            
+        }
     }
 
 
