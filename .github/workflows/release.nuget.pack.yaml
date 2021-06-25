@@ -17,7 +17,7 @@ jobs:
           dotnet-version: '3.1.x' # SDK Version to use.
           source-url: https://nuget.pkg.github.com/YahuiWong/index.json
         env:
-          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NUGET_AUTH_TOKEN: ${{secrets.ACTIONS_TOKEN}}
       - run: dotnet build --configuration Release src/Dapper.Contrib.BulkInsert
       - name: Create the package
         run: dotnet pack --configuration Release src/Dapper.Contrib.BulkInsert
