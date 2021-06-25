@@ -22,4 +22,4 @@ jobs:
       - name: Create the package
         run: dotnet pack --configuration Release src/Dapper.Contrib.BulkInsert
       - name: Publish the package to GPR
-        run: dotnet nuget push src\Dapper.Contrib.BulkInsert/bin/Release/*.nupkg
+        run: dotnet nuget push src/Dapper.Contrib.BulkInsert/bin/Release/*.nupkg
