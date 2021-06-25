@@ -17,7 +17,7 @@ namespace Dapper.Contrib.BulkInsert.Test
         private void CreateTable(ClickHouseConnection conn)
         {
             conn.Execute(
-                "CREATE TABLE IF NOT EXISTS TestUser (ResisterDate Date, ResisterTime DateTime, Name String, Age UInt16) ENGINE=MergeTree(ResisterDate,(ResisterTime,Name,Age), 8192)");
+                "CREATE TABLE IF NOT EXISTS TestUser (ResisterDate Date, ResisterTime  DateTime64(3) DEFAULT now64(3), Name String, Age UInt16) ENGINE=MergeTree(ResisterDate,(ResisterTime,Name,Age), 8192)");
             
         }
         [Fact]

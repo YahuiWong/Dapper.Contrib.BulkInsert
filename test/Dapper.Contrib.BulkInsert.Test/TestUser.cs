@@ -9,6 +9,7 @@ namespace Dapper.Contrib.BulkInsert.Test
     {
         [Date]
         public DateTime ResisterDate { get; set; }
+        [ClickHouseColumn(Name= "ResisterTime", IsOnlyIgnoreInsert =true)]
         public DateTime ResisterTime { get; set; }
         [ColumnName("Name")]
         public string Name { get; set; }

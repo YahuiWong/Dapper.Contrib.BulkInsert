@@ -66,6 +66,10 @@ namespace Dapper.Contrib.BulkInsert
             for (var i = 0; i < allPropertiesExceptKeyAndComputed.Count; i++)
             {
                 var property = allPropertiesExceptKeyAndComputed[i];
+                var clickhouseColumn = GetClickHouseColumn(property);
+
+                if (clickhouseColumn?.IsOnlyIgnoreInsert == true)
+                    continue;
                 sbColumnList.AppendFormat("`{0}`", GetColumnName(property));
                 if (i < allPropertiesExceptKeyAndComputed.Count - 1)
                     sbColumnList.Append(", ");
@@ -83,7 +87,10 @@ namespace Dapper.Contrib.BulkInsert
                     for (var i = 0; i < allPropertiesExceptKeyAndComputed.Count; i++)
                     {
                         var property = allPropertiesExceptKeyAndComputed[i];
+                        var clickhouseColumn = GetClickHouseColumn(property);
 
+                        if (clickhouseColumn?.IsOnlyIgnoreInsert == true)
+                            continue;
                         var val = property.GetValue(item);
                         if (property.PropertyType.IsValueType)
                         {

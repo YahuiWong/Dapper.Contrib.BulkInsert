@@ -56,7 +56,12 @@ namespace Dapper.Contrib.BulkInsert
         /// </summary>
         /// <param name="propertyInfo">The <see cref="PropertyInfo"/> to get a column name for.</param>
         public delegate string ColumnNameMapperDelegate(PropertyInfo propertyInfo);
-
+        /// <summary>
+        /// The function to get a a column name from a given <see cref="Type"/>
+        /// </summary>
+        /// <param name="propertyInfo">The <see cref="PropertyInfo"/> to get a column name for.</param>
+        public delegate ClickHouseColumnAttribute ClickHouseColumnMapperDelegate(PropertyInfo propertyInfo);
+        
         private static readonly ConcurrentDictionary<RuntimeTypeHandle, IEnumerable<PropertyInfo>> KeyProperties =
             new ConcurrentDictionary<RuntimeTypeHandle, IEnumerable<PropertyInfo>>();
 
@@ -76,7 +81,8 @@ namespace Dapper.Contrib.BulkInsert
             new ConcurrentDictionary<RuntimeTypeHandle, string>();
         private static readonly ConcurrentDictionary<int, string> TypeColumnName =
             new ConcurrentDictionary<int, string>();
-
+        private static readonly ConcurrentDictionary<int, ClickHouseColumnAttribute> TypeClickHouseColumn =
+          new ConcurrentDictionary<int, ClickHouseColumnAttribute>();
         private static List<PropertyInfo> ComputedPropertiesCache(Type type)
         {
             if (ComputedProperties.TryGetValue(type.TypeHandle, out IEnumerable<PropertyInfo> pi))
@@ -215,7 +221,12 @@ namespace Dapper.Contrib.BulkInsert
                 }
                 else
                 {
-                    name = info.Name;
+                    var clickhouseColumn = GetClickHouseColumn(propertyInfo);
+
+                    if (!string.IsNullOrEmpty(clickhouseColumn?.Name))
+                        name = clickhouseColumn.Name;
+                    else
+                        name = info.Name;
 
                 }
             }
@@ -223,7 +234,30 @@ namespace Dapper.Contrib.BulkInsert
             TypeColumnName[propertyInfo.GetHashCode()] = name;
             return name;
         }
-       
+        /// <summary>
+        /// Specify a custom Column name mapper based on the POCO type name
+        /// </summary>
+        public static ClickHouseColumnMapperDelegate ClickHouseColumnMapper;
+        private static ClickHouseColumnAttribute GetClickHouseColumn(PropertyInfo propertyInfo)
+        {
+            ;
+            if (TypeClickHouseColumn.TryGetValue(propertyInfo.GetHashCode(), out ClickHouseColumnAttribute columnAttribute)) return columnAttribute;
+            if (ClickHouseColumnMapper != null)
+            {
+                columnAttribute = ClickHouseColumnMapper(propertyInfo);
+            }
+            else
+            {
+                var info = propertyInfo;
+                //NOTE: This as dynamic trick falls back to handle both our own Column-attribute as well as the one in EntityFramework 
+                var columnAtt =
+                    info.GetCustomAttribute<ClickHouseColumnAttribute>(false);
+                return columnAtt;
+            }
+
+            TypeClickHouseColumn[propertyInfo.GetHashCode()] = columnAttribute;
+            return columnAttribute;
+        }
 
         private static (string, DynamicParameters) GenerateBulkSql<T>(IDbConnection connection, IEnumerable<T> entityToInsert)
         {
@@ -250,6 +284,10 @@ namespace Dapper.Contrib.BulkInsert
             for (var i = 0; i < allPropertiesExceptKeyAndComputed.Count; i++)
             {
                 var property = allPropertiesExceptKeyAndComputed[i];
+                var clickhouseColumn = GetClickHouseColumn(property);
+
+                if (clickhouseColumn?.IsOnlyIgnoreInsert == true)
+                    continue;
                 sbColumnList.AppendFormat("{0}", GetColumnName(property));
                 if (i < allPropertiesExceptKeyAndComputed.Count - 1)
                     sbColumnList.Append(", ");
@@ -266,6 +304,11 @@ namespace Dapper.Contrib.BulkInsert
                     for (var i = 0; i < allPropertiesExceptKeyAndComputed.Count; i++)
                     {
                         var property = allPropertiesExceptKeyAndComputed[i];
+
+                        var clickhouseColumn = GetClickHouseColumn(property);
+
+                        if (clickhouseColumn?.IsOnlyIgnoreInsert == true)
+                            continue;
 
                         var val = property.GetValue(item);
                         var columnName = $"@{GetColumnName(property)}{j}{i}";
@@ -376,6 +419,12 @@ namespace Dapper.Contrib.BulkInsert
             for (var i = 0; i < allPropertiesExceptKeyAndComputed.Count; i++)
             {
                 var property = allPropertiesExceptKeyAndComputed[i];
+
+                var  clickhouseColumn = GetClickHouseColumn(property);
+
+                if (clickhouseColumn?.IsOnlyIgnoreInsert == true)
+                    continue;
+
                 sbColumnList.AppendFormat("{0}", GetColumnName(property));
                 if (i < allPropertiesExceptKeyAndComputed.Count - 1)
                     sbColumnList.Append(", ");
@@ -394,6 +443,11 @@ namespace Dapper.Contrib.BulkInsert
                     {
                        
                         var property = allPropertiesExceptKeyAndComputed[i];
+
+                        var clickhouseColumn = GetClickHouseColumn(property);
+
+                        if (clickhouseColumn?.IsOnlyIgnoreInsert == true)
+                            continue;
 
                         var val = property.GetValue(item);
                         //var columnName = $"@{GetColumnName(property)}{j}{i}";
@@ -577,5 +631,15 @@ namespace Dapper.Contrib.BulkInsert
         /// The name of the Column Name in the database
         /// </summary>
         public string Name { get; set; }
+    }
+
+    [AttributeUsage(AttributeTargets.Property)]
+    public class ClickHouseColumnAttribute : Attribute
+    {
+        /// <summary>
+        /// The name of the Column Name in the database
+        /// </summary>
+        public string Name { get; set; }
+        public bool IsOnlyIgnoreInsert { get; set; }
     }
 }
