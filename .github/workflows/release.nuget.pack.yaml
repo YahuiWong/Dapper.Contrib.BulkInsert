@@ -18,8 +18,8 @@ jobs:
           source-url: https://nuget.pkg.github.com/YahuiWong/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      - run: dotnet build --configuration Release src\Dapper.Contrib.BulkInsert
+      - run: dotnet build --configuration Release src/Dapper.Contrib.BulkInsert
       - name: Create the package
-        run: dotnet pack --configuration Release src\Dapper.Contrib.BulkInsert
+        run: dotnet pack --configuration Release src/Dapper.Contrib.BulkInsert
       - name: Publish the package to GPR
         run: dotnet nuget push src\Dapper.Contrib.BulkInsert/bin/Release/*.nupkg
