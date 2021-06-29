@@ -274,7 +274,7 @@ namespace Dapper.Contrib.BulkInsert
             }
 
             var name = GetTableName(type);
-            var sbColumnList = new StringBuilder(null);
+            var sbColumnList = new List<string>();
             var allProperties = TypePropertiesCache(type);
             var keyProperties = KeyPropertiesCache(type);
             var computedProperties = ComputedPropertiesCache(type);
@@ -288,9 +288,7 @@ namespace Dapper.Contrib.BulkInsert
 
                 if (clickhouseColumn?.IsOnlyIgnoreInsert == true)
                     continue;
-                sbColumnList.AppendFormat("{0}", GetColumnName(property));
-                if (i < allPropertiesExceptKeyAndComputed.Count - 1)
-                    sbColumnList.Append(", ");
+                sbColumnList.Add(string.Format("{0}", GetColumnName(property)));
             }
 
             var sbParameterList = new StringBuilder(null);
@@ -362,7 +360,7 @@ namespace Dapper.Contrib.BulkInsert
             sbParameterList.Remove(sbParameterList.Length - 1, 1);
             sbParameterList.Append(";");
             //insert list of entities
-            var cmd = $"insert into {name} ({sbColumnList}) values {sbParameterList}";
+            var cmd = $"insert into {name} ({string.Join(",", sbColumnList)}) values {sbParameterList}";
             return (cmd,parameters);
         }
 
@@ -409,7 +407,7 @@ namespace Dapper.Contrib.BulkInsert
             }
 
             var name = GetTableName(type);
-            var sbColumnList = new StringBuilder(null);
+            var sbColumnList = new List<string>();
             var allProperties = TypePropertiesCache(type);
             var keyProperties = KeyPropertiesCache(type);
             var computedProperties = ComputedPropertiesCache(type);
@@ -425,9 +423,7 @@ namespace Dapper.Contrib.BulkInsert
                 if (clickhouseColumn?.IsOnlyIgnoreInsert == true)
                     continue;
 
-                sbColumnList.AppendFormat("{0}", GetColumnName(property));
-                if (i < allPropertiesExceptKeyAndComputed.Count - 1)
-                    sbColumnList.Append(", ");
+                sbColumnList.Add(string.Format("{0}", GetColumnName(property)));
             }
 
             //var sbParameterList = new StringBuilder(null);
@@ -505,7 +501,8 @@ namespace Dapper.Contrib.BulkInsert
             //sbParameterList.Remove(sbParameterList.Length - 1, 1);
             //sbParameterList.Append(";");
             //insert list of entities
-            var cmd = $"insert into {name} ({sbColumnList}) values  @bulk; ";
+            
+            var cmd = $"insert into {name} ({string.Join(",", sbColumnList) }) values  @bulk; ";
             return (cmd, dynamics);
         }
         /// <summary>

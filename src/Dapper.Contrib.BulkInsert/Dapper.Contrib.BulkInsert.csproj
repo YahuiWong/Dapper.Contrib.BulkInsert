@@ -8,7 +8,7 @@
     <RepositoryUrl>https://github.com/YahuiWong/Dapper.Contrib.BulkInsert.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>clickhouse,dapper,bulk,mysql,sqlserver</PackageTags>
-    <Version>0.1.9</Version>
+    <Version>0.1.13</Version>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 	  <PackageLicenseUrl>https://github.com/YahuiWong/Dapper.Contrib.BulkInsert/blob/master/LICENSE</PackageLicenseUrl>
     <PackageId>Dapper.Contrib.BulkInsert</PackageId>
