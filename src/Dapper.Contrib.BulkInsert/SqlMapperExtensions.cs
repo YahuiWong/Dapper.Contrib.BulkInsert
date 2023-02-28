@@ -259,7 +259,7 @@ namespace Dapper.Contrib.BulkInsert
             return columnAttribute;
         }
 
-        private static (string, DynamicParameters) GenerateBulkSql<T>(IDbConnection connection, IEnumerable<T> entityToInsert)
+        private static (string, DynamicParameters) GenerateBulkSql<T>(IDbConnection connection, IEnumerable<T> entityToInsert, string tableName = null)
         {
             var type = entityToInsert.GetType();
             var typeInfo = type.GetTypeInfo();
@@ -273,7 +273,7 @@ namespace Dapper.Contrib.BulkInsert
                 type = type.GetGenericArguments()[0];
             }
 
-            var name = GetTableName(type);
+            var name = !string.IsNullOrEmpty(tableName) ? tableName : GetTableName(type);
             var sbColumnList = new StringBuilder(null);
             var allProperties = TypePropertiesCache(type);
             var keyProperties = KeyPropertiesCache(type);
@@ -373,9 +373,9 @@ namespace Dapper.Contrib.BulkInsert
         /// <param name="connection">Open SqlConnection</param>
         /// <param name="entityToInsert">Entity to insert, can be list of entities</param>
         /// <returns>Identity of inserted entity, or number of inserted rows if inserting a list</returns>
-        public static void InsertBulk<T>(this ClickHouse.Client.ADO.ClickHouseConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null)
+        public static void InsertBulk<T>(this ClickHouse.Client.ADO.ClickHouseConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null, string tableName = null)
         {
-            InsertBulkAsync(connection, entityToInsert, commandTimeout).GetAwaiter().GetResult();
+            InsertBulkAsync(connection, entityToInsert, commandTimeout, tableName).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -384,9 +384,9 @@ namespace Dapper.Contrib.BulkInsert
         /// <param name="connection">Open SqlConnection</param>
         /// <param name="entityToInsert">Entity to insert, can be list of entities</param>
         /// <returns>Identity of inserted entity, or number of inserted rows if inserting a list</returns>
-        public static void InsertBulk<T>(this IDbConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null)
+        public static void InsertBulk<T>(this IDbConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null, string tableName = null)
         {
-            var cmd = GenerateBulkSql(connection, entityToInsert);
+            var cmd = GenerateBulkSql(connection, entityToInsert, tableName);
 
             var wasClosed = connection.State == ConnectionState.Closed;
             if (wasClosed) connection.Open();
@@ -394,7 +394,8 @@ namespace Dapper.Contrib.BulkInsert
             connection.Execute(cmd.Item1, cmd.Item2, null, commandTimeout);
             if (wasClosed) connection.Close();
         }
-        private static (string, List<dynamic[]>) GenerateCHBulkSql<T>(IDbConnection connection, IEnumerable<T> entityToInsert)
+        
+        private static (string, List<dynamic[]>) GenerateCHBulkSql<T>(IDbConnection connection, IEnumerable<T> entityToInsert, string tableName = null)
         {
             var type = entityToInsert.GetType();
             var typeInfo = type.GetTypeInfo();
@@ -408,7 +409,7 @@ namespace Dapper.Contrib.BulkInsert
                 type = type.GetGenericArguments()[0];
             }
 
-            var name = GetTableName(type);
+            var name = !string.IsNullOrEmpty(tableName) ? tableName : GetTableName(type);
             var sbColumnList = new StringBuilder(null);
             var allProperties = TypePropertiesCache(type);
             var keyProperties = KeyPropertiesCache(type);
@@ -514,9 +515,9 @@ namespace Dapper.Contrib.BulkInsert
         /// <param name="connection">Open SqlConnection</param>
         /// <param name="entityToInsert">Entity to insert, can be list of entities</param>
         /// <returns>Identity of inserted entity, or number of inserted rows if inserting a list</returns>
-        public static void InsertBulk<T>(this ClickHouse.Ado.ClickHouseConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null)
+        public static void InsertBulk<T>(this ClickHouse.Ado.ClickHouseConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null, string tableName = null)
         {
-            var cmd = GenerateCHBulkSql(connection, entityToInsert);
+            var cmd = GenerateCHBulkSql(connection, entityToInsert, tableName);
 
             var wasClosed = connection.State == ConnectionState.Closed;
             if (wasClosed) connection.Open();

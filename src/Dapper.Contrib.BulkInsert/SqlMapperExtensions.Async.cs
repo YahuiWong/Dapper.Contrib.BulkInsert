@@ -20,9 +20,9 @@ namespace Dapper.Contrib.BulkInsert
         /// <param name="entityToInsert">Entity to insert, can be list of entities</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>Identity of inserted entity, or number of inserted rows if inserting a list</returns>
-        public static async Task InsertBulkAsync<T>(this IDbConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null)
+        public static async Task InsertBulkAsync<T>(this IDbConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null, string tableName = null)
         {
-            var cmd = GenerateBulkSql(connection, entityToInsert);
+            var cmd = GenerateBulkSql(connection, entityToInsert, tableName);
 
             var wasClosed = connection.State == ConnectionState.Closed;
             if (wasClosed) connection.Open();
@@ -36,7 +36,7 @@ namespace Dapper.Contrib.BulkInsert
         /// <param name="connection">Open SqlConnection</param>
         /// <param name="entityToInsert">Entity to insert, can be list of entities</param>
         /// <returns>Identity of inserted entity, or number of inserted rows if inserting a list</returns>
-        public static async Task InsertBulkAsync<T>(this ClickHouse.Client.ADO.ClickHouseConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null)
+        public static async Task InsertBulkAsync<T>(this ClickHouse.Client.ADO.ClickHouseConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null, string tableName = null)
         {
 
             var wasClosed = connection.State == ConnectionState.Closed;
@@ -55,7 +55,7 @@ namespace Dapper.Contrib.BulkInsert
                 type = type.GetGenericArguments()[0];
             }
 
-            var name = GetTableName(type);
+            var name = !string.IsNullOrEmpty(tableName) ? tableName : GetTableName(type);
             var sbColumnList = new StringBuilder(null);
             var allProperties = TypePropertiesCache(type);
             var keyProperties = KeyPropertiesCache(type);
@@ -141,9 +141,9 @@ namespace Dapper.Contrib.BulkInsert
         /// <param name="connection">Open SqlConnection</param>
         /// <param name="entityToInsert">Entity to insert, can be list of entities</param>
         /// <returns>Identity of inserted entity, or number of inserted rows if inserting a list</returns>
-        public static async Task InsertBulkAsync<T>(this ClickHouse.Ado.ClickHouseConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null)
+        public static async Task InsertBulkAsync<T>(this ClickHouse.Ado.ClickHouseConnection connection, IEnumerable<T> entityToInsert, int? commandTimeout = null, string tableName = null)
         {
-            await Task.Run(() => InsertBulk(connection, entityToInsert, commandTimeout)
+            await Task.Run(() => InsertBulk(connection, entityToInsert, commandTimeout, tableName)
             );
             
         }
